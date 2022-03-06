@@ -35,7 +35,6 @@ def move(obj, cam):
     randX = random.uniform(-x, x)
     randZ = random.uniform(-z , z)
     obj.location = (randX, randY, randZ)
-    bpy.ops.object.transform_apply(location=True, rotation=False, scale=False)
         
 def rotate(obj): 
     if random.random() < 0.9:
@@ -47,16 +46,16 @@ def rotate(obj):
         ry = 0
         rz = 0
     obj.rotation_euler = Euler((rx, ry, rz), 'XYZ')
-    bpy.ops.object.transform_apply(location=False, rotation=True, scale=False)
-
     
 def scale(obj):
     scale = random.uniform(0.1, 1.5)
     scl = [scale for _ in range(3)]
     obj.scale = scl
-    bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
 
 def transform(obj, cam):
     rotate(obj)
     scale(obj)
     move(obj,cam)
+    bpy.context.active_object.select_set(False)
+    obj.select_set(True)
+    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
