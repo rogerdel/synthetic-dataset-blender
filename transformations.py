@@ -3,8 +3,6 @@ import random
 from math import tan, atan, radians
 from mathutils import Euler
 
-cam = bpy.data.objects['Camera']
-
 def distance(a,b):
     d = a.location - b.location
     for i in range(len(d)):
@@ -57,3 +55,8 @@ def scale(obj):
     scl = [scale for _ in range(3)]
     obj.scale = scl
     bpy.ops.object.transform_apply(location=False, rotation=False, scale=True)
+
+def transform(obj, cam):
+    rotate(obj)
+    scale(obj)
+    move(obj,cam)

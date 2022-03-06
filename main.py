@@ -5,7 +5,7 @@ import bpy_extras
 
 sys.path.append(r'C:/Users/Roger/Documents/synthetic_dataset')
 
-from transformations import move, rotate, scale
+from transformations import transform
 
 def convertYolo(x1,y1,x2,y2, shape):
     x = ((x1 + x2) / 2) / shape[1]
@@ -60,6 +60,12 @@ def renderMany():
         bpy.ops.render.render(write_still = True)
         i += 1
 
+def useObject(obj):
+    data = obj.data.copy()
+    data.name = obj.data.name
+    transform(obj, cam)
+    save(obj)
+    obj.data = data
 
 if __name__ == '__main__':
     obj   = bpy.context.scene.objects['Suzanne'] 
@@ -67,13 +73,4 @@ if __name__ == '__main__':
     scene = bpy.context.scene
     mat   = obj.matrix_world
 
-    data = obj.data.copy()
-
-    data.name = obj.data.name
-    # rotate(obj)
-    # scale(obj)
-    move(obj,cam)
-    save(obj)
-    
-    obj.data = data
-    
+    useObject(obj)
