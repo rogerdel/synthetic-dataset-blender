@@ -1,11 +1,13 @@
+from re import X
 import sys
 import bpy
 from pathlib import Path
 import bpy_extras
+import numpy as np
 
 sys.path.append(r'C:/Users/Roger/Documents/synthetic_dataset')
 
-from transformations import transform
+from transformations import transform, move, distance
 
 def convertYolo(x1,y1,x2,y2, shape):
     x = ((x1 + x2) / 2) / shape[1]
@@ -14,11 +16,12 @@ def convertYolo(x1,y1,x2,y2, shape):
     w = abs(x2 - x1) / shape[1]
     return x, y, w, h
 
-
-def save(obj):
+def boundingBox(obj):
     renderScale = scene.render.resolution_percentage / 100
     width  = int(scene.render.resolution_x * renderScale)
     height = int(scene.render.resolution_y * renderScale)
+    mat   = obj.matrix_world
+    
     x, y, _ = bpy_extras.object_utils.world_to_camera_view(scene, cam, obj.data.vertices[0].co)
     left = right = x
     top = bottom = y
@@ -32,10 +35,20 @@ def save(obj):
         bottom = min(bottom, y)
 
     p1 = (int(left * width), height - int(top *  height))
-    p2 = (int(right * width), height - int(bottom * height))
-    # Coordenates dont exceed the image
+    p2 = (int(right * width), height - int(bottom * height))  
     p1 = (max(p1[0], 0), max(p1[1], 0))
     p2 = (min(p2[0], width), min(p2[1], height))
+    return p1,p2 
+
+def save(obj):
+    renderScale = scene.render.resolution_percentage / 100
+    width  = int(scene.render.resolution_x * renderScale)
+    height = int(scene.render.resolution_y * renderScale)    
+    # Coordenates dont exceed the image
+    p1,p2 = boundingBox(obj)
+    p1 = (max(p1[0], 0), max(p1[1], 0))
+    p2 = (min(p2[0], width), min(p2[1], height))
+    
     x, y, w, h = convertYolo(p1[0], p1[1], p2[0], p2[1], (height, width))
 
     bpy.context.scene.render.filepath = 'E:/Devs/Python/readyolo/monkey.jpg'
@@ -59,18 +72,31 @@ def renderMany():
         bpy.context.scene.render.filepath = str(outputPath / f'{str(i).zfill(6)}.png')
         bpy.ops.render.render(write_still = True)
         i += 1
+def intersersct(obj1,obj2):
+    # Boundingbox the objects
+    o1p1, o1p2 = boundingBox(obj1)
+    o2p1, o2p2  = boundingBox(obj2)
+    return o1p1[0] < o2p2[0] and o1p2[0] > o2p1[0] and o1p1[1] < o2p2[1] and o1p2[1] > o2p1[1] 
 
 def useObject(obj):
     data = obj.data.copy()
+    obj.hide_render = False   
     data.name = obj.data.name
     transform(obj, cam)
     save(obj)
     obj.data = data
+    obj.hide_render = True
+
 
 if __name__ == '__main__':
-    obj   = bpy.context.scene.objects['Suzanne'] 
     cam   = bpy.data.objects['Camera']
     scene = bpy.context.scene
-    mat   = obj.matrix_world
 
-    useObject(obj)
+    objs =[i.name for i in bpy.data.collections['Objects'].all_objects]
+    
+    for i in objs:
+        bpy.context.scene.objects[i].hide_render = True
+    
+    for i in objs:
+        obj = bpy.context.scene.objects[i]
+        useObject(obj)
