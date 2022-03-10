@@ -1,14 +1,13 @@
-from re import X
 import sys
 import bpy
 from pathlib import Path
 import bpy_extras
-import numpy as np
-import time 
+import random 
 
 sys.path.append(r'C:/Users/Roger/Documents/synthetic_dataset')
 
-from transformations import transform, move, distance
+from transformations import transform
+from objOps import delete
 
 def convertYolo(x1,y1,x2,y2, shape):
     x = ((x1 + x2) / 2) / shape[1]
@@ -42,13 +41,17 @@ def boundingBox(obj, yoloFormat = False):
     p2 = (min(p2[0], width), min(p2[1], height))
     if yoloFormat:
         return convertYolo(p1[0], p1[1], p2[0], p2[1], (height, width))
-    return p1,p2 
+    return p1, p2 
 
-def save(obj):
-    x, y, w, h = boundingBox(obj, True)
+def save(objs):
     bpy.context.scene.render.filepath = 'E:/Devs/Python/readyolo/monkey.jpg'
     with open ('E:/Devs/Python/readyolo/monkey.txt', 'w') as f:
-        f.write(f'0 {x} {y} {w} {h}')        
+        for obj in objs:
+            x, y, w, h = boundingBox(obj, True)
+            f.write(f'0 {x} {y} {w} {h}')
+            if obj != objs[-1]:
+                f.write('\n')  
+    
     bpy.ops.render.render(write_still = True)
 
 def changeBackground(path):
@@ -71,18 +74,40 @@ def intersersct(obj1,obj2):
     o2p1, o2p2  = boundingBox(obj2)
     return o1p1[0] < o2p2[0] and o1p2[0] > o2p1[0] and o1p1[1] < o2p2[1] and o1p2[1] > o2p1[1] 
 
-def useObject(object):
-    obj = object.copy()
-    obj.data = object.data.copy()
-    bpy.context.scene.collection.objects.link(obj)
-    obj = bpy.context.scene.objects[obj.name]
-    obj.hide_render = False   
-    transform(obj, cam)
-    save(obj)
-    bpy.ops.object.select_all(action='DESELECT')
-    obj.select_set(True)
-    bpy.ops.object.delete()
-    
+def appendOjbs(obj):
+    renderObjs = [obj.name]
+    for i in objs:
+        if random.random() > 0.6:
+            renderObjs.append(i)
+    return renderObjs
+
+def useObject(obj):  
+    renObjs = appendOjbs(obj)
+    objects = []
+    for i in renObjs:
+        objc = bpy.context.scene.objects[i].copy()
+        objc.data = bpy.context.scene.objects[i].data.copy()
+        bpy.context.scene.collection.objects.link(objc)
+        objc.hide_render = False
+        transform(objc, cam)
+        b = True
+        for _ in range(100):
+            for o in objects:
+                b = b and not intersersct(o, objc)            
+            if b:
+                objects.append(objc)
+                break
+            else:
+                objc.data = bpy.context.scene.objects[i].data.copy()
+                transform(objc, cam)
+                b = True
+
+        if not b:
+            delete(obj)
+
+    save(objects)
+    for obj in objects:
+        delete(obj)
 
 if __name__ == '__main__':
     cam   = bpy.data.objects['Camera']
@@ -93,6 +118,5 @@ if __name__ == '__main__':
     for i in objs:
         bpy.context.scene.objects[i].hide_render = True
     
-    for i in objs:
-        obj = bpy.context.scene.objects[i]
-        useObject(obj) 
+    obj = bpy.context.scene.objects[objs[0]]
+    useObject(obj)

@@ -2,6 +2,7 @@ import bpy
 import random
 from math import tan, atan, radians
 from mathutils import Euler
+from objOps import select
 
 def distance(a,b):
     d = a.location - b.location
@@ -55,7 +56,8 @@ def scale(obj):
 def transform(obj, cam):
     rotate(obj)
     scale(obj)
+    select(obj)
+    bpy.ops.object.transform_apply(rotation=True, scale=True)
     move(obj,cam)
-    bpy.ops.object.select_all(action='DESELECT')
-    obj.select_set(True)
-    bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
+    select(obj)
+    bpy.ops.object.transform_apply(location=True)
