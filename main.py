@@ -2,7 +2,7 @@ import sys
 import bpy
 from pathlib import Path
 import bpy_extras
-import random 
+import random
 
 sys.path.append(r'C:/Users/Roger/Documents/synthetic_dataset')
 
@@ -43,13 +43,14 @@ def boundingBox(obj, yoloFormat = False):
         return convertYolo(p1[0], p1[1], p2[0], p2[1], (height, width))
     return p1, p2 
 
-def save(objs):
+def save(objs, colls):
     bpy.context.scene.render.filepath = 'E:/Devs/Python/readyolo/monkey.jpg'
     with open ('E:/Devs/Python/readyolo/monkey.txt', 'w') as f:
-        for obj in objs:
-            x, y, w, h = boundingBox(obj, True)
-            f.write(f'0 {x} {y} {w} {h}')
-            if obj != objs[-1]:
+        ln = len(objs)
+        for i in range(len(objs)):
+            x, y, w, h = boundingBox(objs[i], True)
+            f.write(f'{revnames[colls[i]]} {x} {y} {w} {h}')
+            if i != ln - 1 :
                 f.write('\n')  
     
     bpy.ops.render.render(write_still = True)
@@ -74,15 +75,29 @@ def intersersct(obj1,obj2):
     o2p1, o2p2  = boundingBox(obj2)
     return o1p1[0] < o2p2[0] and o1p2[0] > o2p1[0] and o1p1[1] < o2p2[1] and o1p2[1] > o2p1[1] 
 
-def appendOjbs(obj):
-    renderObjs = [obj.name]
-    for i in objs:
+def init():
+    revNames = {}
+    ln = len(collections)
+    with open('classes.txt', 'w') as f:
+        for i in range(ln):
+            collections[i].hide_render = True
+            f.write(collections[i].name)
+            revNames[collections[i].name] = i
+            if i != ln -1:
+                f.write('\n')
+    return revNames
+        
+def chooseObjs(collection):
+    colls = [collection.name]
+    renderObjs = [random.choice(collection.all_objects).name]
+    for i in collections:
         if random.random() > 0.6:
-            renderObjs.append(i)
-    return renderObjs
+            renderObjs.append(random.choice(i.all_objects).name)
+            colls.append(i.name)
+    return renderObjs, colls
 
-def useObject(obj):  
-    renObjs = appendOjbs(obj)
+def useCollection(collection):
+    renObjs, colls = chooseObjs(collection)
     objects = []
     for i in renObjs:
         objc = bpy.context.scene.objects[i].copy()
@@ -105,18 +120,15 @@ def useObject(obj):
         if not b:
             delete(obj)
 
-    save(objects)
+    save(objects, colls)
     for obj in objects:
         delete(obj)
 
 if __name__ == '__main__':
     cam   = bpy.data.objects['Camera']
     scene = bpy.context.scene
-
-    objs =[i.name for i in bpy.data.collections['Objects'].all_objects]
-    
-    for i in objs:
-        bpy.context.scene.objects[i].hide_render = True
-    
-    obj = bpy.context.scene.objects[objs[0]]
-    useObject(obj)
+    collectionname = 'Objects'
+    collections = bpy.data.collections[collectionname].children
+    revnames = init()
+    col = collections[0]
+    useCollection(col)
