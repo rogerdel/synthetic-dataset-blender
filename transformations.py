@@ -56,6 +56,6 @@ def transform(obj, cam):
     rotate(obj)
     scale(obj)
     move(obj,cam)
-    bpy.context.active_object.select_set(False)
+    bpy.ops.object.select_all(action='DESELECT')
     obj.select_set(True)
     bpy.ops.object.transform_apply(location=True, rotation=True, scale=True)
