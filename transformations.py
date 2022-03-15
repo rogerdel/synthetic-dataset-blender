@@ -1,36 +1,18 @@
 import bpy
 import random
-from math import tan, atan, radians
+from math import radians
 from mathutils import Euler
 from objOps import select
+from camera import camBox
 
-def distance(a,b):
-    d = a.location - b.location
-    for i in range(len(d)):
-        d[i] = abs(d[i])        
-    return d
-
-def getAngles(camera):
-    scene = scene = bpy.context.scene    
-    frame = camera.data.view_frame(scene = scene)
-    x = abs(frame[0][0])
-    y = abs(frame[0][1])
-    z = abs(frame[0][2])
-    angleX = atan(x/z)
-    angleY = atan(y/z)
-    return angleX, angleY
-
-def move(obj, cam):
-    randY = random.uniform(-1,20)
+def move(obj):
+    maxY = bpy.context.scene.objects['Plane'].location[1]
+    randY = random.uniform(-1, maxY)
     obj.location[1] = randY 
-    angleX, angleY = getAngles(cam)
-    distanceY = distance(obj, cam)[1]
-    width  = tan(angleX) * distanceY
-    height = tan(angleY) * distanceY
+    width, height = camBox(obj)
     owidth, _, oheight = obj.dimensions    
     owidth /= 2
     oheight /= 2
-    
     x = width - owidth
     z = height - oheight
     randX = random.uniform(-x, x)
@@ -53,11 +35,11 @@ def scale(obj):
     scl = [scale for _ in range(3)]
     obj.scale = scl
 
-def transform(obj, cam):
+def transform(obj):
     rotate(obj)
     scale(obj)
     select(obj)
     bpy.ops.object.transform_apply(rotation=True, scale=True)
-    move(obj,cam)
+    move(obj)
     select(obj)
     bpy.ops.object.transform_apply(location=True)

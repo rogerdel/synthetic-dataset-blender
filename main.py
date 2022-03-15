@@ -3,11 +3,13 @@ import bpy
 from pathlib import Path
 import bpy_extras
 import random
+import os
+import string
 
 sys.path.append(r'C:/Users/Roger/Documents/synthetic_dataset')
-
 from transformations import transform
 from objOps import delete
+from background import changeBackground
 
 def convertYolo(x1,y1,x2,y2, shape):
     x = ((x1 + x2) / 2) / shape[1]
@@ -21,7 +23,6 @@ def boundingBox(obj, yoloFormat = False):
     width  = int(scene.render.resolution_x * renderScale)
     height = int(scene.render.resolution_y * renderScale)
     mat   = obj.matrix_world
-    
     x, y, _ = bpy_extras.object_utils.world_to_camera_view(scene, cam, obj.data.vertices[0].co)
     left = right = x
     top = bottom = y
@@ -43,32 +44,38 @@ def boundingBox(obj, yoloFormat = False):
         return convertYolo(p1[0], p1[1], p2[0], p2[1], (height, width))
     return p1, p2 
 
+def randomFilename():
+    name = ''.join(random.choice(letters) for _ in range(filenameSize))
+    return f'{saveDir}/{name}'
+
+    
 def save(objs, colls):
-    bpy.context.scene.render.filepath = 'E:/Devs/Python/readyolo/monkey.jpg'
-    with open ('E:/Devs/Python/readyolo/monkey.txt', 'w') as f:
+    """
+    Definitely change the names of this things
+    """
+    # filename = randomFilename()
+    filename = f'{saveDir}/{imgIndex}'
+    bpy.context.scene.render.filepath = f'{filename}.png'
+    with open (f'{filename}.txt', 'w') as f:
         ln = len(objs)
         for i in range(len(objs)):
             x, y, w, h = boundingBox(objs[i], True)
             f.write(f'{revnames[colls[i]]} {x} {y} {w} {h}')
             if i != ln - 1 :
                 f.write('\n')  
-    
     bpy.ops.render.render(write_still = True)
-
-def changeBackground(path):
-    image = bpy.data.images.load(path)
-    bpy.data.materials['Background'].node_tree.nodes['Image Texture'].image = image
-
 
 def renderMany():
     directory = Path('C:/Users/Roger/Documents/Backgrounds')
     outputPath = Path('E:/images')
     i = 0
     for f in directory.iterdir():
-        changeBackground(str(f))
+        img = changeBackground(str(f))
         bpy.context.scene.render.filepath = str(outputPath / f'{str(i).zfill(6)}.png')
         bpy.ops.render.render(write_still = True)
         i += 1
+        bpy.data.images.remove(img)
+
 def intersersct(obj1,obj2):
     # Boundingbox the objects
     o1p1, o1p2 = boundingBox(obj1)
@@ -99,12 +106,15 @@ def chooseObjs(collection):
 def useCollection(collection):
     renObjs, colls = chooseObjs(collection)
     objects = []
+    global imgIndex
+    img = changeBackground(imgs[imgIndex])
+    imgIndex = (imgIndex + 1) % lnImg
     for i in renObjs:
         objc = bpy.context.scene.objects[i].copy()
         objc.data = bpy.context.scene.objects[i].data.copy()
         bpy.context.scene.collection.objects.link(objc)
         objc.hide_render = False
-        transform(objc, cam)
+        transform(objc)
         b = True
         for _ in range(100):
             for o in objects:
@@ -114,21 +124,34 @@ def useCollection(collection):
                 break
             else:
                 objc.data = bpy.context.scene.objects[i].data.copy()
-                transform(objc, cam)
+                transform(objc)
                 b = True
-
         if not b:
             delete(obj)
-
     save(objects, colls)
     for obj in objects:
         delete(obj)
+    bpy.data.images.remove(img)
+    
 
 if __name__ == '__main__':
+    letters = string.ascii_lowercase + string.ascii_uppercase
+    filenameSize = 10
+    saveDir = 'E:/Devs/Python/readyolo/dataset/'
+    imgDir = 'C:/Users/Roger/Documents/Backgrounds'
+    imgIndex = 0
+    imgs = [os.path.join(imgDir, i) for i in os.listdir(imgDir)]
+    lnImg = len(imgs)
+
     cam   = bpy.data.objects['Camera']
     scene = bpy.context.scene
     collectionname = 'Objects'
     collections = bpy.data.collections[collectionname].children
     revnames = init()
-    col = collections[0]
-    useCollection(col)
+
+    if not os.path.exists(saveDir):
+        os.mkdir(saveDir)
+    n = 2
+    for i in collections:
+        for _ in range(n):
+            useCollection(i)
