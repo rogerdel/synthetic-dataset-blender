@@ -6,7 +6,7 @@ from objOps import select
 from camera import camBox
 
 def move(obj):
-    maxY = bpy.context.scene.objects['Plane'].location[1]
+    maxY = bpy.context.scene.objects['Plane'].location[1] - obj.dimensions[1]
     randY = random.uniform(-1, maxY)
     obj.location[1] = randY 
     width, height = camBox(obj)

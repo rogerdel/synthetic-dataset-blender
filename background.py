@@ -5,7 +5,7 @@ from camera import adjustResolution, camBox
 
 plane = bpy.context.scene.objects['Plane']
 def movePlane():
-    plane.location = (0, random.randint(10, 30), 0)
+    plane.location = (0, random.randint(10, 25), 0)
 
 def adjustBackground(img):
     img = bpy.data.images[img.name]
