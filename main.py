@@ -57,18 +57,18 @@ def useCollection(collection):
         objc.hide_render = False
         transform(objc)
         b = True
-        for _ in range(100):
+        for j in range(100):
             for o in objects:
                 b = b and not intersersct(o, objc)            
             if b:
                 objects.append(objc)
                 break
-            else:
+            elif j != 99:
                 objc.data = bpy.context.scene.objects[i].data.copy()
                 transform(objc)
                 b = True
         if not b:
-            delete(obj)
+            delete(objc)
     save(objects, colls)
     for obj in objects:
         delete(obj)
