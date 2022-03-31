@@ -4,6 +4,7 @@ from math import radians
 from mathutils import Euler
 from objOps import select
 from camera import camBox
+from data import scale_min, scale_max, minrot, maxrot, prob_roate, prob_scale
 
 def move(obj):
     maxY = bpy.context.scene.objects['Plane'].location[1] - obj.dimensions[1]
@@ -20,20 +21,17 @@ def move(obj):
     obj.location = (randX, randY, randZ)
         
 def rotate(obj): 
-    if random.random() < 0.9:
-        rx = radians(random.randint(0, 360))
-        ry = radians(random.randint(0, 360))
-        rz = radians(random.randint(0, 360)) 
-    else:
-        rx = 0
-        ry = 0
-        rz = 0
-    obj.rotation_euler = Euler((rx, ry, rz), 'XYZ')
+    if random.random() < prob_roate:
+        rx = radians(random.randint(minrot[0], maxrot[0]))
+        ry = radians(random.randint(minrot[1], maxrot[1]))
+        rz = radians(random.randint(minrot[2], maxrot[2])) 
+        obj.rotation_euler = Euler((rx, ry, rz), 'XYZ')
     
 def scale(obj):
-    scale = random.uniform(0.1, 1.5)
-    scl = [scale for _ in range(3)]
-    obj.scale = scl
+    if random.random() < prob_scale:
+        scale = random.uniform(scale_min, scale_max)
+        scl = [scale for _ in range(3)]
+        obj.scale = scl
 
 def transform(obj):
     rotate(obj)

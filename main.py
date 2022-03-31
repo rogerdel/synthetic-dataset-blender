@@ -10,7 +10,7 @@ from objOps import delete
 from background import changeBackground
 from camera import boundingBox
 from utils import init
-
+from data import filenameSize, saveDir, imgDir, images_per_class, prob_many_objs
     
 def save(objs, colls):
     filename = randomFilename()
@@ -39,7 +39,7 @@ def chooseObjs(collection):
     collectionsNames = [collection.name]
     renderObjs = [random.choice(collection.all_objects).name]
     for i in collections:
-        if random.random() > 0.6:
+        if random.random() < prob_many_objs:
             renderObjs.append(random.choice(i.all_objects).name)
             collectionsNames.append(i.name)
     return renderObjs, collectionsNames
@@ -80,11 +80,8 @@ def main(n):
             useCollection(i)
 
 if __name__ == '__main__':
-    filenameSize   = 10
     imgIndex       = 0
-    saveDir        = 'E:/Devs/Python/readyolo/dataset/'
-    imgDir         = 'C:/Users/Roger/Documents/Backgrounds'
     imgs           = [os.path.join(imgDir, i) for i in os.listdir(imgDir)]
     collections    = bpy.data.collections['Objects'].children
-    names          = init(collections, saveDir)    
-    main(2)
+    names          = init(collections, saveDir)
+    main(images_per_class)

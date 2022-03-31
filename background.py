@@ -2,10 +2,11 @@ import bpy
 import random
 from transformations import camBox
 from camera import adjustResolution, camBox
+from data import background_max_y, background_min_y
 
 plane = bpy.context.scene.objects['Plane']
 def movePlane():
-    plane.location = (0, random.randint(10, 25), 0)
+    plane.location = (0, random.randint(background_min_y, background_max_y), 0)
 
 def adjustBackground(img):
     img = bpy.data.images[img.name]
