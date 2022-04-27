@@ -1,8 +1,8 @@
 # Initial data
-images_per_class = 1
+images_per_class = 1000
 filenameSize     = 10
-saveDir          = 'E:/Devs/Python/readyolo/dataset/'
-imgDir           = 'C:/Users/Roger/Documents/Backgrounds'
+saveDir          = 'E:/dataset_shyntethic'
+imgDir           = 'E:/Devs/Python/Synthetic images/images/background'
 prob_many_objs   = 0.3
 prob_add_obj     = 0.5
 
