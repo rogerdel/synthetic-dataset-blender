@@ -27,3 +27,12 @@ def init(collections, path):
             if i != ln -1:
                 f.write('\n')
     return names
+
+def progress(colname, i= None, n=None):
+    with open('progress.txt', 'a') as f:
+        if i==None and n == None:
+            f.write('-------------------------------------------\n')
+            f.write(f'\t\t\tdone {colname}\n')
+            f.write('-------------------------------------------\n')
+            return
+        f.write(f'{colname} {i}/{n}\n')

@@ -1,4 +1,5 @@
 import sys
+import time
 import bpy
 import random
 import os
@@ -9,7 +10,7 @@ from transformations import transform
 from objOps import delete
 from background import changeBackground
 from camera import boundingBox, changeFocalLength
-from utils import init
+from utils import init, progress
 from data import filenameSize, saveDir, imgDir, images_per_class, prob_many_objs, prob_add_obj
 from color import shiftColor
 
@@ -83,12 +84,17 @@ def useCollection(collection):
 
 def main(n):
     for i in collections:
-        for _ in range(n):
+        for j in range(n):
             useCollection(i)
+            progress(i.name, j+1, n)
+        progress(i.name)
 
 if __name__ == '__main__':
+    startTime = time.time()
     imgIndex       = 0
     imgs           = [os.path.join(imgDir, i) for i in os.listdir(imgDir)]
     collections    = bpy.data.collections['Objects'].children
     names          = init(collections, saveDir)
     main(images_per_class)
+    totalTime =  time.time() - startTime    
+    print('Total time:', totalTime)

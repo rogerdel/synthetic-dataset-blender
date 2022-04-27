@@ -3,19 +3,19 @@ images_per_class = 1
 filenameSize     = 10
 saveDir          = 'E:/Devs/Python/readyolo/dataset/'
 imgDir           = 'C:/Users/Roger/Documents/Backgrounds'
-prob_many_objs   = 0.4
+prob_many_objs   = 0.3
 prob_add_obj     = 0.5
 
 # transformation
 # scale
 prob_scale       = 0.7
 scale_min        = 1
-scale_max        = 2
+scale_max        = 1.5
 
 # rotation (x, y, z) between -360 and 360
 prob_roate       = 0.9
-minrot           = [-90, 0, -90]
-maxrot           = [90, 360, 90]
+minrot           = [-80, 0, 0]
+maxrot           = [80, 360, 360]
 
 # background
 background_min_y = 5
@@ -28,7 +28,7 @@ objData = {
     },
     'bottle': {
         'sameColorProb': 0.9,
-        'Plastic_transparent': 0,
+        'Plastic_transparent': 0.3,
         'lid': 1,
         'label': 1,
         'inner label': 0
