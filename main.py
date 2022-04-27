@@ -8,9 +8,9 @@ sys.path.append(r'C:/Users/Roger/Documents/synthetic_dataset')
 from transformations import transform
 from objOps import delete
 from background import changeBackground
-from camera import boundingBox
+from camera import boundingBox, changeFocalLength
 from utils import init
-from data import filenameSize, saveDir, imgDir, images_per_class, prob_many_objs
+from data import filenameSize, saveDir, imgDir, images_per_class, prob_many_objs, prob_add_obj
     
 def save(objs, colls):
     filename = randomFilename()
@@ -38,13 +38,15 @@ def randomFilename():
 def chooseObjs(collection):
     collectionsNames = [collection.name]
     renderObjs = [random.choice(collection.all_objects).name]
-    for i in collections:
-        if random.random() < prob_many_objs:
-            renderObjs.append(random.choice(i.all_objects).name)
-            collectionsNames.append(i.name)
+    if random.random() < prob_many_objs:
+        for i in collections:
+            if random.random() < prob_add_obj:
+                renderObjs.append(random.choice(i.all_objects).name)
+                collectionsNames.append(i.name)
     return renderObjs, collectionsNames
 
 def useCollection(collection):
+    changeFocalLength()
     renObjs, colls = chooseObjs(collection)
     objects = []
     global imgIndex

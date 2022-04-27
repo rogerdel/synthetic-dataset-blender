@@ -30,6 +30,12 @@ def adjustResolution(img):
     bpy.context.scene.render.resolution_y = height
     bpy.context.scene.render.resolution_percentage = random.randint(10, 50) if width > 3000 or height > 3000 else 100
 
+def changeFocalLength(val= None):
+    if val:
+        cam.data.lens = val
+    else:
+        cam.data.lens = random.randint(20,65)
+
 def boundingBox(obj, yoloFormat = False):
     scene = bpy.context.scene
     renderScale = scene.render.resolution_percentage / 100
