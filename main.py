@@ -11,7 +11,8 @@ from background import changeBackground
 from camera import boundingBox, changeFocalLength
 from utils import init
 from data import filenameSize, saveDir, imgDir, images_per_class, prob_many_objs, prob_add_obj
-    
+from color import shiftColor
+
 def save(objs, colls):
     filename = randomFilename()
     bpy.context.scene.render.filepath = f'{filename}'
@@ -49,6 +50,7 @@ def useCollection(collection):
     changeFocalLength()
     renObjs, colls = chooseObjs(collection)
     objects = []
+    materials = []
     global imgIndex
     img = changeBackground(imgs[imgIndex])
     imgIndex = (imgIndex + 1) % len(imgs)
@@ -58,6 +60,7 @@ def useCollection(collection):
         bpy.context.scene.collection.objects.link(objc)
         objc.hide_render = False
         transform(objc)
+        materials += shiftColor(objc, bpy.context.scene.objects[i].users_collection[0].name) 
         b = True
         for j in range(100):
             for o in objects:
@@ -75,6 +78,8 @@ def useCollection(collection):
     for obj in objects:
         delete(obj)
     bpy.data.images.remove(img)
+    for material in materials:
+        bpy.data.materials.remove(material)
 
 def main(n):
     for i in collections:
