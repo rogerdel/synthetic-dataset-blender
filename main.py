@@ -5,7 +5,7 @@ import random
 import os
 import string
 
-sys.path.append(r'C:/Users/Roger/Documents/synthetic_dataset')
+sys.path.append(r'.')
 from transformations import transform
 from objOps import delete
 from background import changeBackground
