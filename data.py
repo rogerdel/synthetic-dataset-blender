@@ -1,8 +1,8 @@
 # Initial data
 images_per_class = 1000
 filenameSize     = 10
-saveDir          = 'E:/dataset_shyntethic'
-imgDir           = 'E:/Devs/Python/Synthetic images/images/background'
+saveDir          = 'D:/dataset_shyntethic'
+imgDir           = 'D:/Devs/python/images/background'
 prob_many_objs   = 0.3
 prob_add_obj     = 0.5
 
@@ -18,8 +18,8 @@ minrot           = [-80, 0, 0]
 maxrot           = [80, 360, 360]
 
 # background
-background_min_y = 5
-background_max_y = 15
+background_min_y = 0
+background_max_y = 6
 
 objData = {
     'bag': {

@@ -28,7 +28,7 @@ def adjustResolution(img):
     width, height = img.size
     bpy.context.scene.render.resolution_x = width
     bpy.context.scene.render.resolution_y = height
-    bpy.context.scene.render.resolution_percentage = random.randint(15, 50) if width > 3000 or height > 3000 else 100
+    bpy.context.scene.render.resolution_percentage = random.randint(30, 60) if width > 3000 or height > 3000 else 100
 
 def changeFocalLength(val= None):
     if val:
