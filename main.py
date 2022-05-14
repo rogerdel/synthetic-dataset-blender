@@ -5,7 +5,7 @@ import random
 import os
 import string
 
-sys.path.append(r'.')
+sys.path.append('.')
 from transformations import transform
 from objOps import delete
 from background import changeBackground
@@ -52,9 +52,7 @@ def useCollection(collection):
     renObjs, colls = chooseObjs(collection)
     objects = []
     materials = []
-    global imgIndex
-    img = changeBackground(imgs[imgIndex])
-    imgIndex = (imgIndex + 1) % len(imgs)
+    img = changeBackground(random.choice(imgs))
     for i in renObjs:
         objc = bpy.context.scene.objects[i].copy()
         objc.data = bpy.context.scene.objects[i].data.copy()
@@ -91,7 +89,6 @@ def main(n):
 
 if __name__ == '__main__':
     startTime = time.time()
-    imgIndex       = 0
     imgs           = [os.path.join(imgDir, i) for i in os.listdir(imgDir)]
     collections    = bpy.data.collections['Objects'].children
     names          = init(collections, saveDir)
