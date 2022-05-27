@@ -24,7 +24,7 @@ scale_min        = 1
 scale_max        = 1.5
 
 # rotation (x, y, z) between -360 and 360
-prob_roate       = 0.9
+prob_roate       = 0.55
 minrot           = [-80, 0, 0]
 maxrot           = [80, 360, 360]
 
@@ -38,11 +38,11 @@ objData = {
         'transparent bag': 0.7
     },
     'bottle': {
-        'sameColorProb': 0.9,
         'Plastic_transparent': 0.3,
         'lid': 1,
         'label': 1,
-        'inner label': 0
+        'inner label': 0,
+        'no_label_prob': 0.1
     },
     'container': {
         'Plastic_transparent': 0.005,

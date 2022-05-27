@@ -42,22 +42,31 @@ def colorRamp(material, color = None):
 
 def colorBottle(obj, collectionName):
     materials = []
-    color = (random.random(), random.random(), random.random(), 1)
     for i in range(len(obj.material_slots)):
+        no_label_prob =  objData[collectionName]['no_label_prob']
         material = obj.material_slots[i].material
+        prob = 0
+        # remove label maeterial
+        if random.random() < no_label_prob and 'label' in material.name:
+            material = obj.material_slots[0].material
+        else:
+            prob = objData[collectionName][material.name]
         newMaterial = material.copy()
         obj.material_slots[i].material = newMaterial
         materials.append(newMaterial)
-        prob = objData[collectionName][material.name]
         if random.random() < prob:
-            sameColorProb = objData[collectionName]['sameColorProb'] if 'sameColorProb' in objData[collectionName] else 0
-            if i > 0 and random.random() > sameColorProb:
-                color = None
-            colorChange(newMaterial, color)
-
+            color = (random.random(), random.random(), random.random(), 1)
+            if material.name == 'label':
+                noise = newMaterial.node_tree.nodes['Noise Texture.001']
+                noise.inputs['Scale'].default_value = random.uniform(2,30)
+                noise.inputs['Detail'].default_value = random.uniform(0,2)
+                noise.inputs['Roughness'].default_value = random.uniform(0,0.55)
+                noise.inputs['Distortion'].default_value = random.uniform(0,2)
+                newMaterial.node_tree.nodes["Principled BSDF"].inputs['Transmission'].default_value = random.random()
+                colorRamp(newMaterial)
+            else:
+                colorChange(newMaterial, color)
     return materials
-    
-    
 
 
 matereialBSDFS = {
